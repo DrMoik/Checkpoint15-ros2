@@ -1,11 +1,11 @@
 version: '3'
 services:
-  tortoisebot-ros1-gazebo:
+  tortoisebot-ros2-gazebo:
     build:
       context: ./
       dockerfile: Dockerfile_gazebo
-    image: tortoisebot-ros1-gazebo
-    container_name: tortoisebot-ros1-gazebo_1
+    image: tortoisebot-ros2-gazebo
+    container_name: tortoisebot-ros2-gazebo_1
     network_mode: host
     environment:
       - "DISPLAY=${DISPLAY}"
@@ -18,44 +18,13 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile_slam
-    image: tortoisebot-ros1-slam
-    container_name: tortoisebot-ros1-slam_1
+    image: tortoisebot-ros2-slam
+    container_name: tortoisebot-ros2-slam_1
     network_mode: host
     depends_on:
-      - tortoisebot-ros1-gazebo
+      - tortoisebot-ros2-gazebo
     environment:
       - "DISPLAY=${DISPLAY}"
       - "ROS_MASTER_URI=http://localhost:11311"
     volumes:
       - "/tmp/.X11-unix:/tmp/.X11-unix"
-
-  tortoisebot-ros1-webapp:
-    build:
-      context: ./
-      dockerfile: Dockerfile_webapp
-    image: tortoisebot-ros1-webapp
-    container_name: tortoisebot-ros1-webapp_1
-    network_mode: host
-    depends_on:
-      - tortoisebot-ros1-slam
-    environment:
-      - "DISPLAY=${DISPLAY}"
-      - "ROS_MASTER_URI=http://localhost:11311"
-    volumes:
-      - "/tmp/.X11-unix:/tmp/.X11-unix"
-  
-  tortoisebot-ros1-waypoints:
-    build:
-      context: ./
-      dockerfile: Dockerfile_waypoints
-    image: tortoisebot-ros1-waypoints
-    container_name: tortoisebot-ros1-waypoints_1
-    network_mode: host
-    depends_on:
-      - tortoisebot-ros1-webapp
-    environment:
-      - "DISPLAY=${DISPLAY}"
-      - "ROS_MASTER_URI=http://localhost:11311"
-    volumes:
-      - "/tmp/.X11-unix:/tmp/.X11-unix"
-  

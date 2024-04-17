@@ -1,37 +1,32 @@
-# Base image
-FROM osrf/ros:noetic-desktop-full-focal
+# Use the official ROS2 Galactic desktop image as the base image
+FROM osrf/ros:galactic-desktop
 
-# Install Gazebo 11 and other dependencies
-RUN apt-get update && apt-get install -y \
-  gazebo11 \
-  ros-noetic-gazebo-ros-pkgs \
-  ros-noetic-gazebo-ros-control \
-  ros-noetic-ros-control \
-  ros-noetic-ros-controllers \
-  ros-noetic-joint-state-publisher \
-  ros-noetic-joint-state-controller \
-  ros-noetic-robot-state-publisher \
-  ros-noetic-robot-localization \
-  ros-noetic-xacro \
-  ros-noetic-tf2-ros \
-  ros-noetic-tf2-tools \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y \
+        gazebo11 \
+        ros-galactic-gazebo-ros-pkgs \
+        ros-galactic-ros2-controllers \
+        ros-galactic-joint-state-publisher \
+        ros-galactic-robot-state-publisher \
+        ros-galactic-robot-localization \
+        ros-galactic-xacro \
+        ros-galactic-tf2-ros \
+        ros-galactic-tf2-tools \
+        ros-galactic-robot-state-publisher \
+        ros-galactic-ament-cmake \
+    && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install TurtleBot3 via Debian Packages
-RUN apt update && apt install -y ros-noetic-dynamixel-sdk ros-noetic-turtlebot3-msgs ros-noetic-turtlebot3
+# Set the working directory
+WORKDIR /ros2_ws
 
-# make workspace
-WORKDIR /catkin_ws/src
-
-# Copy the files in the current directory into the container
-COPY ./src/ /catkin_ws/src/
+# Copy your ROS2 package(s) into the workspace
+COPY ./src/ /ros2_ws/src/
 
 # Build the workspace
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && cd /catkin_ws && catkin_make"
+RUN /bin/bash -c "source /opt/ros/galactic/setup.bash && colcon build "
 
-# Source the ROS setup script
-RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
-RUN echo "source /catkin_ws/devel/setup.bash" >> ~/.bashrc
 
-# Command to run when starting the container
-CMD /bin/bash -c "source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && roslaunch tortoisebot_gazebo tortoisebot_playground.launch"
+# Specify a command that runs indefinitely
+
+CMD /bin/bash -c "source /ros2_ws/install/setup.sh && ros2 launch tortoisebot_bringup bringup.launch.py use_sim_time:=True"
